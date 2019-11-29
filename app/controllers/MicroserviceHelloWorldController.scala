@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.interestrestrictionreturndynamicstub.controllers
+package controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
-import uk.gov.hmrc.interestrestrictionreturndynamicstub.config.AppConfig
+import config.AppConfig
 
 import scala.concurrent.Future
 
