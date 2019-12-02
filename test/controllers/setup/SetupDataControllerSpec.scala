@@ -30,7 +30,7 @@ class SetupDataControllerSpec extends TestSupport with MockSchemaValidation with
   "SetupDataController.addData" when {
 
     val model: DataModel = DataModel(
-      _id = DataIdModel("1234", method = "GET"),
+      _id = DataIdModel("1234", method = "GET", None),
       schemaId = "2345",
       response = Some(Json.parse("{}")),
       status = Status.OK)
@@ -76,7 +76,7 @@ class SetupDataControllerSpec extends TestSupport with MockSchemaValidation with
       "not a GET request" should {
 
         val model: DataModel = DataModel(
-          _id = DataIdModel("1234", method = "BLOB"),
+          _id = DataIdModel("1234", method = "BLOB", None),
           schemaId = "2345",
           response = Some(Json.parse("{}")),
           status = Status.OK)

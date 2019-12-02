@@ -16,6 +16,7 @@
 
 package controllers.stub
 
+import config.HeaderKeys
 import controllers.BaseController
 import controllers.predicates.CannedResponsePredicate
 import javax.inject.{Inject, Singleton}
@@ -35,7 +36,7 @@ class RequestHandlerController @Inject()(schemaValidation: SchemaValidation,
 
   def getRequestHandler(url: String): Action[AnyContent] = Action.async { implicit request =>
     cannedResponsePredicate {
-      findById(dataRepository)(DataIdModel(request.uri, GET)) { data =>
+      findById(dataRepository)(DataIdModel(request.uri, GET, headerIds(request))) { data =>
         Future.successful(returnResponse(data))
       }
     }
@@ -44,9 +45,15 @@ class RequestHandlerController @Inject()(schemaValidation: SchemaValidation,
   def postRequestHandler(url: String): Action[AnyContent] = requestHandler(url,POST)
   def putRequestHandler(url: String): Action[AnyContent] = requestHandler(url,PUT)
 
+  private val headerIds: Request[_] => Option[Map[String,String]] =
+    _.headers.toSimpleMap.filterKeys(HeaderKeys.validIdHeaders) match {
+      case headers if headers.nonEmpty => Some(headers)
+      case _ => None
+    }
+
   private def requestHandler(url: String, method: String): Action[AnyContent] = Action.async { implicit request =>
     cannedResponsePredicate {
-      findById(dataRepository)(DataIdModel(request.uri, method)) { stubData =>
+      findById(dataRepository)(DataIdModel(request.uri, method, headerIds(request))) { stubData =>
         schemaValidation.validateRequestJson(stubData.schemaId, request.body.asJson) {
           Future.successful(returnResponse(stubData))
         }

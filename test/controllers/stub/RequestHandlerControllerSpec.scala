@@ -35,7 +35,7 @@ class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation
   )
 
   lazy val successWithBodyModel: String => DataModel = method => DataModel(
-    _id = DataIdModel("test", method),
+    _id = DataIdModel("test", method, None),
     schemaId = "testID2",
     status = Status.OK,
     response = Some(Json.parse("""{"something" : "hello"}"""))
@@ -77,7 +77,7 @@ class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation
 
       lazy val result = TestRequestHandlerController.postRequestHandler(dataModel._id.url)(request)
 
-      mockFindById(DataIdModel(dataModel._id.url, POST))(Some(dataModel))
+      mockFindById(DataIdModel(dataModel._id.url, POST, None))(Some(dataModel))
       mockValidateRequestJson(dataModel.schemaId, request.body.asJson)(success = true)
 
       await(bodyOf(result)) shouldBe s"${dataModel.response.get}"
