@@ -1,0 +1,5 @@
+# Stub Response Routes
+
+GET        /*url                                                 controllers.stub.RequestHandlerController.getRequestHandler(url)
+POST       /*url                                                 controllers.stub.RequestHandlerController.postRequestHandler(url)
+PUT        /*url                                                 controllers.stub.RequestHandlerController.putRequestHandler(url)

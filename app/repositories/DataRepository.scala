@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.interestrestrictionreturndynamicstub.controllers
+package repositories
 
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
-import uk.gov.hmrc.interestrestrictionreturndynamicstub.config.AppConfig
+import models.{DataIdModel, DataModel}
+import play.modules.reactivemongo.ReactiveMongoComponent
+import uk.gov.hmrc.mongo.ReactiveRepository
 
-import scala.concurrent.Future
-
-@Singleton()
-class MicroserviceHelloWorldController @Inject()(appConfig: AppConfig, cc: ControllerComponents)
-    extends BackendController(cc) {
-
-  def hello(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("Hello world"))
-  }
-}
+@Singleton
+class DataRepository @Inject()(mongoComponent: ReactiveMongoComponent)
+  extends ReactiveRepository[DataModel, DataIdModel](
+    collectionName = "data",
+    mongo          = mongoComponent.mongoConnector.db,
+    domainFormat   = DataModel.formats,
+    idFormat       = DataIdModel.formats
+  )
