@@ -17,6 +17,7 @@
 package utils
 
 import com.typesafe.config.Config
+import controllers.predicates.CannedResponsePredicate
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
@@ -33,5 +34,7 @@ trait TestSupport extends UnitSpec with GuiceOneServerPerSuite with MockitoSugar
   implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
   implicit val config: Config = app.configuration.underlying
+
+  lazy val cannedResponsePredicate = app.injector.instanceOf[CannedResponsePredicate]
 
 }

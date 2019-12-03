@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package config
+package controllers.predicates
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import config.AppConfig
+import config.featureSwitch.{FeatureSwitching, UseStaticCannedResponse}
+import javax.inject.Inject
+import play.api.libs.json.Json
+import play.api.mvc.Results.Ok
+import play.api.mvc._
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, val servicesConfig: ServicesConfig) {
+import scala.concurrent.Future
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
+class CannedResponsePredicate @Inject()(implicit appConfig: AppConfig) extends FeatureSwitching {
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
+  def apply(f: => Future[Result]): Future[Result] = {
+    if(isEnabled(UseStaticCannedResponse)) {
+      Future.successful(Ok(Json.obj("acknowledgementReference" -> "ackRef1234")))
+    } else {
+      f
+    }
+  }
+
 }

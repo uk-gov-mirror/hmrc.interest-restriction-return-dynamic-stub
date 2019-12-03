@@ -16,6 +16,7 @@
 
 package controllers.stub
 
+import config.featureSwitch.{FeatureSwitching, UseStaticCannedResponse}
 import mocks.{MockDataRepository, MockSchemaValidation}
 import models.HttpMethod._
 import models.{DataIdModel, DataModel}
@@ -24,9 +25,14 @@ import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.Status
 import utils.TestSupport
 
-class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation with MockDataRepository {
+class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation with MockDataRepository with FeatureSwitching {
 
-  object TestRequestHandlerController extends RequestHandlerController(mockSchemaValidation, mockDataRepository, Helpers.stubControllerComponents())
+  object TestRequestHandlerController extends RequestHandlerController(
+    mockSchemaValidation,
+    mockDataRepository,
+    cannedResponsePredicate,
+    Helpers.stubControllerComponents()
+  )
 
   lazy val successWithBodyModel: String => DataModel = method => DataModel(
     _id = DataIdModel("test", method),
@@ -53,6 +59,13 @@ class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation
       mockFindById(dataModel._id)()
       status(result) shouldBe Status.NOT_FOUND
     }
+
+    "return a canned 200 response if the UseStaticCannedResponse is on" in {
+      enable(UseStaticCannedResponse)
+      val result = TestRequestHandlerController.getRequestHandler(dataModel._id.url)(FakeRequest())
+      status(result) shouldBe Status.OK
+      disable(UseStaticCannedResponse)
+    }
   }
 
   "The postRequestHandler method" should {
@@ -76,6 +89,13 @@ class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation
       mockFindById(dataModel._id)()
       status(result) shouldBe Status.NOT_FOUND
     }
+
+    "return a canned 200 response if the UseStaticCannedResponse is on" in {
+      enable(UseStaticCannedResponse)
+      val result = TestRequestHandlerController.postRequestHandler(dataModel._id.url)(request)
+      status(result) shouldBe Status.OK
+      disable(UseStaticCannedResponse)
+    }
   }
 
 
@@ -98,6 +118,13 @@ class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation
 
       mockFindById(dataModel._id)()
       status(result) shouldBe Status.NOT_FOUND
+    }
+
+    "return a canned 200 response if the UseStaticCannedResponse is on" in {
+      enable(UseStaticCannedResponse)
+      val result = TestRequestHandlerController.putRequestHandler(dataModel._id.url)(request)
+      status(result) shouldBe Status.OK
+      disable(UseStaticCannedResponse)
     }
   }
 

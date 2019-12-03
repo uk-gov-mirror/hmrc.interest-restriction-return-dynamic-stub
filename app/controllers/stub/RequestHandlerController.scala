@@ -17,6 +17,7 @@
 package controllers.stub
 
 import controllers.BaseController
+import controllers.predicates.CannedResponsePredicate
 import javax.inject.{Inject, Singleton}
 import models.HttpMethod._
 import models.{DataIdModel, DataModel}
@@ -28,12 +29,15 @@ import scala.concurrent.Future
 
 @Singleton
 class RequestHandlerController @Inject()(schemaValidation: SchemaValidation,
-                                                 dataRepository: DataRepository,
-                                                 override val controllerComponents: ControllerComponents) extends BaseController with MongoSugar {
+                                         dataRepository: DataRepository,
+                                         cannedResponsePredicate: CannedResponsePredicate,
+                                         override val controllerComponents: ControllerComponents) extends BaseController with MongoSugar {
 
   def getRequestHandler(url: String): Action[AnyContent] = Action.async { implicit request =>
-    findById(dataRepository)(DataIdModel(request.uri, GET)) { data =>
-      Future.successful(returnResponse(data))
+    cannedResponsePredicate {
+      findById(dataRepository)(DataIdModel(request.uri, GET)) { data =>
+        Future.successful(returnResponse(data))
+      }
     }
   }
 
@@ -41,9 +45,11 @@ class RequestHandlerController @Inject()(schemaValidation: SchemaValidation,
   def putRequestHandler(url: String): Action[AnyContent] = requestHandler(url,PUT)
 
   private def requestHandler(url: String, method: String): Action[AnyContent] = Action.async { implicit request =>
-    findById(dataRepository)(DataIdModel(request.uri, method)) { stubData =>
-      schemaValidation.validateRequestJson(stubData.schemaId, request.body.asJson) {
-        Future.successful(returnResponse(stubData))
+    cannedResponsePredicate {
+      findById(dataRepository)(DataIdModel(request.uri, method)) { stubData =>
+        schemaValidation.validateRequestJson(stubData.schemaId, request.body.asJson) {
+          Future.successful(returnResponse(stubData))
+        }
       }
     }
   }
