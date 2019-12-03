@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package config
 
-import play.api.libs.json.{Json, OFormat}
+object HeaderKeys {
 
-case class DataIdModel(url: String,
-                       method: String,
-                       headers: Option[Map[String,String]])
+  val providerId = "providerId"
 
-object DataIdModel {
-  implicit val formats: OFormat[DataIdModel] = Json.format[DataIdModel]
+  val validIdHeaders = Set(providerId)
+
 }
