@@ -22,11 +22,10 @@ import models.HttpMethod._
 import models.{AcknowledgementModel, DataIdModel, DataModel}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatest.concurrent.ScalaFutures
-import play.api.libs.json.{JsResult, Json}
+import play.api.libs.json.Json
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.Status
 import utils.TestSupport
-
 
 class RequestHandlerControllerSpec extends TestSupport with ScalaFutures with MockSchemaValidation with MockDataRepository with FeatureSwitching {
 
