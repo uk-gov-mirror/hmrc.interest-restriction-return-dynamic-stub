@@ -16,16 +16,19 @@
 
 package controllers.stub
 
-import config.featureSwitch.{FeatureSwitching, UseStaticCannedResponse}
+import config.featureSwitch.{FeatureSwitching, UseStaticCannedResponse, UseTimeBasedCannedResponse}
 import mocks.{MockDataRepository, MockSchemaValidation}
 import models.HttpMethod._
-import models.{DataIdModel, DataModel}
-import play.api.libs.json.Json
+import models.{AcknowledgementModel, DataIdModel, DataModel}
+import org.joda.time.{DateTime, DateTimeZone}
+import org.scalatest.concurrent.ScalaFutures
+import play.api.libs.json.{JsResult, Json}
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.Status
 import utils.TestSupport
 
-class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation with MockDataRepository with FeatureSwitching {
+
+class RequestHandlerControllerSpec extends TestSupport with ScalaFutures with MockSchemaValidation with MockDataRepository with FeatureSwitching {
 
   object TestRequestHandlerController extends RequestHandlerController(
     mockSchemaValidation,
@@ -125,6 +128,38 @@ class RequestHandlerControllerSpec extends TestSupport with MockSchemaValidation
       val result = TestRequestHandlerController.putRequestHandler(dataModel._id.url)(request)
       status(result) shouldBe Status.OK
       disable(UseStaticCannedResponse)
+    }
+
+    "return the expected canned static reference if the UseStaticCannedResponse is on" in {
+      enable(UseStaticCannedResponse)
+      val result = TestRequestHandlerController.putRequestHandler(dataModel._id.url)(request)
+      whenReady(result) { res =>
+        val jbody = jsonBodyOf(res)
+        val placeResult:AcknowledgementModel = Json.fromJson[AcknowledgementModel](jbody).get
+        val ackReference = placeResult.acknowledgementReference
+        "ackRef1234" should equal(ackReference)
+      }
+      disable(UseStaticCannedResponse)
+    }
+
+    "return a canned 200 response if the UseTimeBasedCannedResponse is on" in {
+      enable(UseTimeBasedCannedResponse)
+      val result = TestRequestHandlerController.putRequestHandler(dataModel._id.url)(request)
+      status(result) shouldBe Status.OK
+      disable(UseTimeBasedCannedResponse)
+    }
+
+    "return a time in the TimeBasedCannedResponse before now if the UseTimeBasedCannedResponse is on" in {
+      enable(UseTimeBasedCannedResponse)
+      val result = TestRequestHandlerController.putRequestHandler(dataModel._id.url)(request)
+      whenReady(result) { res =>
+        val jbody = jsonBodyOf(res)
+        val placeResult:AcknowledgementModel = Json.fromJson[AcknowledgementModel](jbody).get
+        val ack = placeResult.acknowledgementReference
+        val now = DateTime.now(DateTimeZone.UTC).getMillis()
+        ack.toLong should be < now
+      }
+      disable(UseTimeBasedCannedResponse)
     }
   }
 
