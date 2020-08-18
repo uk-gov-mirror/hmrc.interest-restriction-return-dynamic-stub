@@ -52,3 +52,4 @@ case object UseStaticCannedResponse extends BooleanFeatureSwitch {
 case object UseTimeBasedCannedResponse extends BooleanFeatureSwitch {
   override val name: String = s"$prefix.useTimeBasedCannedResponse"
 }
+
