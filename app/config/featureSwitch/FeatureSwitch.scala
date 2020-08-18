@@ -22,7 +22,7 @@ object FeatureSwitch {
 
   val prefix = "features"
 
-  val switches: Seq[FeatureSwitch] = Seq(UseStaticCannedResponse)
+  val switches: Seq[FeatureSwitch] = Seq(UseStaticCannedResponse, UseTimeBasedCannedResponse)
   val booleanFeatureSwitches: Seq[BooleanFeatureSwitch] = switches.collect{case a: BooleanFeatureSwitch => a}
   val customValueFeatureSwitch: Seq[CustomValueFeatureSwitch] = switches.collect{case a: CustomValueFeatureSwitch => a}
 
@@ -48,3 +48,8 @@ sealed trait CustomValueFeatureSwitch extends FeatureSwitch {
 case object UseStaticCannedResponse extends BooleanFeatureSwitch {
   override val name: String = s"$prefix.useStaticCannedResponse"
 }
+
+case object UseTimeBasedCannedResponse extends BooleanFeatureSwitch {
+  override val name: String = s"$prefix.useTimeBasedCannedResponse"
+}
+
