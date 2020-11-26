@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package controllers
 
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.{Inject, Singleton}
+import play.api.mvc._
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-case class DataIdModel(url: String,
-                       method: String,
-                       headers: Option[Map[String,String]])
+import scala.concurrent.Future
 
-object DataIdModel {
-  implicit val formats: OFormat[DataIdModel] = Json.format[DataIdModel]
+
+@Singleton()
+class FullReturn @Inject()(cc: ControllerComponents) extends BackendController(cc) {
+  def fullReturn(): Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok("test"))
+  }
 }

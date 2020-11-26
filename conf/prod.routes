@@ -1,7 +1,4 @@
 # Prod Routes
 
-->         /setup                                          setup.Routes
-->         /                                               health.Routes
-->         /                                               stub.Routes
 
 GET        /admin/metrics                                  @com.kenshoo.play.metrics.MetricsController.metrics
