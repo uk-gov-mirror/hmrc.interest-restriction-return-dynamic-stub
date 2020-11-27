@@ -25,39 +25,43 @@ import scala.io.Source
 import scala.util._
 import play.api.libs.json._
 import play.api.Logging
+import play.api.http.{HeaderNames, Status}
 
 @Singleton()
 class FullReturnController @Inject()(cc: ControllerComponents) extends BackendController(cc) with Logging {
 
   def fullReturn(): Action[AnyContent] = Action.async { implicit request =>
-    val jsonBody: Option[JsValue] = request.body.asJson
-    val fullReturnJsonSchema = Try(Source.fromFile("conf/resources/schemas/submit_full_irr.json").mkString) 
-    fullReturnJsonSchema match {
-      case Success(schema) =>
-        val fullJsonSchema : JsValue = Json.parse(schema)
-        JsonSchemaHelper.validRequest(fullJsonSchema, jsonBody) match {
-            case true => {
-              /***/
-
-              val agentName = (jsonBody.getOrElse(JsString("")) \ "agentDetails" \ "agentName").as[String]
-              
-              if (agentName == "ServerError")
-              {
-                Future.successful(InternalServerError(agentName))
-              }  
-              else 
-              {
-                val responseString = """{"acknowledgementReference":"1234"}"""
-                val responseJson = Json.parse(responseString)
-                Future.successful(Created(responseJson))
+    if (request.headers.get(HeaderNames.AUTHORIZATION).isDefined) {
+      val jsonBody: Option[JsValue] = request.body.asJson
+      val fullReturnJsonSchema = Try(Source.fromFile("conf/resources/schemas/submit_full_irr.json").mkString) 
+      fullReturnJsonSchema match {
+        case Success(schema) =>
+          val fullJsonSchema : JsValue = Json.parse(schema)
+          JsonSchemaHelper.validRequest(fullJsonSchema, jsonBody) match {
+              case true => {
+                val agentName = (jsonBody.getOrElse(JsString("")) \ "agentDetails" \ "agentName").as[String]
+                
+                agentName match {
+                  case "ServerError" => Future.successful(InternalServerError(agentName))
+                  case "ServiceUnavailable" => Future.successful(ServiceUnavailable(agentName))
+                  case "Unauthorized" => Future.successful(Unauthorized(agentName))
+                  case _ => {
+                    val responseString = """{"acknowledgementReference":"1234"}"""
+                    val responseJson = Json.parse(responseString)
+                    Future.successful(Created(responseJson))
+                  }
+                }
               }
-            }
-            case false => Future.successful(BadRequest("test"))
-        }
-      case Failure(e) => 
-        logger.error(s"Error: ${e.getMessage}", e)
-        Future.successful(InternalServerError(""))
+              case false => Future.successful(BadRequest("test"))
+          }
+        case Failure(e) => 
+          logger.error(s"Error: ${e.getMessage}", e)
+          Future.successful(InternalServerError(""))
+      }
+    } else {
+      Future.successful(Unauthorized(""))
     }
 
   }
+
 }

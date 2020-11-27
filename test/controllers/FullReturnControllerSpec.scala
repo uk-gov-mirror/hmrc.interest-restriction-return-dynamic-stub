@@ -19,7 +19,7 @@ package controllers
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.http.Status
+import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsValue, Json, JsObject, JsString}
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
@@ -31,10 +31,11 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
   val fullJsonSchema : JsValue = Json.parse(fullReturnJsonSchema)
   val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
 
+  val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
 
   "POST of a full return" should {
     "return 201 when the payload is validated" in {
-      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody);
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody);
       val controller = new FullReturnController(Helpers.stubControllerComponents());
 
       val result = controller.fullReturn()(fakeRequest)
@@ -44,7 +45,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
     "returns 400 when the payload is invalid" in {
       val exampleInvalidJsonBody = exampleJsonBody.as[JsObject] - "agentDetails"
-      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleInvalidJsonBody)
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleInvalidJsonBody)
       val controller = new FullReturnController(Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
@@ -53,7 +54,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     }
 
     "returns a body containing acknowledgementReference when the payload is validated" in {
-      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody);
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody);
       val controller = new FullReturnController(Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
@@ -62,14 +63,58 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     }
 
     "returns a 500 when a ServerError agent name is passed" in {
-      val agentDetails = exampleJsonBody \ "agentDetails"
-      val amendedAgentDetails = agentDetails.as[JsObject] + ("agentName" -> JsString("ServerError"))
-      val amendedBody = exampleJsonBody.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
-      val fakeRequest = FakeRequest("POST", "/").withJsonBody(amendedBody)
+      val amendedBody = changeAgentName(exampleJsonBody, "ServerError")
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new FullReturnController(Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
+
+    "returns 503 when a Service unavailable agent name is passed" in {
+      val amendedBody = changeAgentName(exampleJsonBody, "ServiceUnavailable")
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new FullReturnController(Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.SERVICE_UNAVAILABLE
+    }
+
+    "returns 401 when an Unauthorized agent name is passed" in {
+      val amendedBody = changeAgentName(exampleJsonBody, "Unauthorized")
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new FullReturnController(Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.UNAUTHORIZED
+    }
+
+    "returns 201 when a bearer token is passed" in {
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody)
+      val controller = new FullReturnController(Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+    }
+
+    "returns 401 when a bearer token is not passed" in {
+      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody)
+      val controller = new FullReturnController(Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.UNAUTHORIZED
+    }
+
+  }
+
+  def changeAgentName(body: JsValue, newAgentName: String): JsObject = {
+    val agentDetails = body.as[JsObject] \ "agentDetails"
+    val amendedAgentDetails = agentDetails.as[JsObject] + ("agentName" -> JsString(newAgentName))
+    exampleJsonBody.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
   }
 }
+
+/*
+MDTP will need following Kong Bearer token to access these EIS APIS and based on my past conversation with MDTP (for some other project) 
+they need a day to configure this bearer token at their end.
+Kong token : THhp0fseNReXWL5ljkqrz0bb0wRhgbjT*/
