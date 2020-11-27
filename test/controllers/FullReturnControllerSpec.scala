@@ -24,6 +24,8 @@ import play.api.libs.json.{JsValue, Json, JsObject, JsString}
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
 import scala.io.Source
+import actions.AuthenticatedAction
+import play.api.mvc.BodyParsers
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -32,11 +34,15 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
   val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
 
   val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
+  
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
+  val bodyParsers = app.injector.instanceOf[BodyParsers.Default]
+  val authenticatedAction: AuthenticatedAction = new AuthenticatedAction(bodyParsers)
 
   "POST of a full return" should {
     "return 201 when the payload is validated" in {
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody);
-      val controller = new FullReturnController(Helpers.stubControllerComponents());
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents());
 
       val result = controller.fullReturn()(fakeRequest)
  
@@ -46,7 +52,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     "returns 400 when the payload is invalid" in {
       val exampleInvalidJsonBody = exampleJsonBody.as[JsObject] - "agentDetails"
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleInvalidJsonBody)
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
 
@@ -55,7 +61,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
     "returns a body containing acknowledgementReference when the payload is validated" in {
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody);
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
 
@@ -65,7 +71,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     "returns a 500 when a ServerError agent name is passed" in {
       val amendedBody = changeAgentName(exampleJsonBody, "ServerError")
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
@@ -74,7 +80,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     "returns 503 when a Service unavailable agent name is passed" in {
       val amendedBody = changeAgentName(exampleJsonBody, "ServiceUnavailable")
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.SERVICE_UNAVAILABLE
@@ -83,7 +89,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     "returns 401 when an Unauthorized agent name is passed" in {
       val amendedBody = changeAgentName(exampleJsonBody, "Unauthorized")
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
@@ -91,7 +97,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
     "returns 201 when a bearer token is passed" in {
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody)
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.CREATED
@@ -99,7 +105,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
     "returns 401 when a bearer token is not passed" in {
       val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody)
-      val controller = new FullReturnController(Helpers.stubControllerComponents())
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
