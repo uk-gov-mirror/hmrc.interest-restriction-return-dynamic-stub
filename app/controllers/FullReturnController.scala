@@ -64,4 +64,13 @@ class FullReturnController @Inject()(cc: ControllerComponents) extends BackendCo
 
   }
 
+  def validateHeaders(headers: Headers, f: => Action[AnyContent]): Action[AnyContent] = {
+    if (headers.get(HeaderNames.AUTHORIZATION).isDefined) {
+      f
+    } else {
+      Future.successful(Unauthorized(""))
+    }
+
+  }
+
 }
