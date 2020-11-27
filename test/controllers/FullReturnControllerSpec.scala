@@ -20,19 +20,34 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
+import scala.io.Source
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+
+  val fullReturnJsonSchema = Source.fromFile("conf/resources/schemas/submit_full_irr.json").mkString
+  val fullJsonSchema : JsValue = Json.parse(fullReturnJsonSchema)
+  val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
+
   "POST of a full return" should {
     "return 201 when the payload is validated" in {
-      val fakeRequest = FakeRequest("POST", "/").withJsonBody(Json.obj("foo" -> "bar"))
+      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody);
       val controller = new FullReturnController(Helpers.stubControllerComponents());
 
       val result = controller.fullReturn()(fakeRequest)
 
       status(result) shouldBe Status.CREATED
+    }
+
+    "returns 400 when the payload is invalid" in {
+      val fakeRequest = FakeRequest("POST", "/").withJsonBody(Json.obj("test" -> "test"))
+      val controller = new FullReturnController(Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
     }
   }
 }
