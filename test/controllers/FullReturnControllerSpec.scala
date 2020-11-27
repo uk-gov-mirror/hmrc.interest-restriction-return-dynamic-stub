@@ -30,7 +30,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
   val fullReturnJsonSchema = Source.fromFile("conf/resources/schemas/submit_full_irr.json").mkString
   val fullJsonSchema : JsValue = Json.parse(fullReturnJsonSchema)
   val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
-
+ 
   "POST of a full return" should {
     "return 201 when the payload is validated" in {
       val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody);

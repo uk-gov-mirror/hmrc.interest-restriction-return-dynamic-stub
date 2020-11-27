@@ -68,12 +68,12 @@ class FullReturnController @Inject()(cc: ControllerComponents) extends BackendCo
     //    val source = Source.fromFile(getClass.getResource(s"/$filename").getPath)
     ///   // conf/resources/submit_full_irr.json
     // val fullReturnJsonSchema = Try(Source.fromResource("/resources/submit_full_irr.json").getLines.mkString)
-    val fullReturnJsonSchema = Try(Source.fromFile("conf/resources/schemas/submit_full_irr.json").mkString)
+    val fullReturnJsonSchema = Try(Source.fromFile("conf/resources/schemas/test.json").mkString)
     fullReturnJsonSchema match {
       case Success(schema) =>
         val fullJsonSchema : JsValue = Json.parse(schema)
-        val jsonSchema = (fullJsonSchema \ "components" \ "schemas" \ "request").as[JsValue]
-        validRequest(jsonSchema, jsonBody) match {
+        //val jsonSchema = (fullJsonSchema \ "components" \ "schemas" \ "request").as[JsValue]
+        validRequest(fullJsonSchema, jsonBody) match {
             case true => Future.successful(Created("test"))
             case false => Future.successful(BadRequest("test"))
         }
