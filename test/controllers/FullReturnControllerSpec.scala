@@ -26,13 +26,13 @@ import play.api.test.Helpers._
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
   "POST of a full return" should {
-    "return 200" in {
+    "return 201 when the payload is validated" in {
       val fakeRequest = FakeRequest("POST", "/").withJsonBody(Json.obj("foo" -> "bar"))
-      val controller = new FullReturn(Helpers.stubControllerComponents());
+      val controller = new FullReturnController(Helpers.stubControllerComponents());
 
       val result = controller.fullReturn()(fakeRequest)
 
-      status(result) shouldBe Status.OK
+      status(result) shouldBe Status.CREATED
     }
   }
 }

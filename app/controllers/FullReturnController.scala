@@ -24,8 +24,8 @@ import scala.concurrent.Future
 
 
 @Singleton()
-class FullReturn @Inject()(cc: ControllerComponents) extends BackendController(cc) {
+class FullReturnController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
   def fullReturn(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("test"))
+    Future.successful(Created("test"))
   }
 }
