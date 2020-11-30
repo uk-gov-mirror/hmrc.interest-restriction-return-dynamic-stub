@@ -113,6 +113,14 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       contentAsString(result) shouldBe "Missing Bearer Token"
     }
 
+    "returns 400 when a body is empty" in {
+      val fakeRequest = FakeRequestWithHeaders
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) shouldBe "Missing body"
+    }
   }
 
   def changeAgentName(body: JsValue, newAgentName: String): JsObject = {
