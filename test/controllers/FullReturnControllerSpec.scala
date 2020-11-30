@@ -122,8 +122,3 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     exampleJsonBody.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
   }
 }
-
-/*
-MDTP will need following Kong Bearer token to access these EIS APIS and based on my past conversation with MDTP (for some other project) 
-they need a day to configure this bearer token at their end.
-Kong token : THhp0fseNReXWL5ljkqrz0bb0wRhgbjT*/
