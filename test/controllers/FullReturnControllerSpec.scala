@@ -30,7 +30,7 @@ import play.api.mvc.BodyParsers
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val fullReturnJsonSchema = Source.fromFile("conf/resources/schemas/submit_full_irr_apidef.json").mkString
+  val fullReturnJsonSchema = Source.fromFile("conf/resources/api/submit_full_irr_apidef.json").mkString
   val fullJsonSchema : JsValue = Json.parse(fullReturnJsonSchema)
   val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
 
