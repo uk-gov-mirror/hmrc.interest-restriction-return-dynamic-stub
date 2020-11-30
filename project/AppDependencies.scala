@@ -13,7 +13,8 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-test-play-27"   % "2.24.0" % Test,
     "org.scalatest"           %% "scalatest"                % "3.1.2"                 % Test,
     "com.typesafe.play"       %% "play-test"                % current                 % Test,
-    "com.vladsch.flexmark"    %  "flexmark-all"             % "0.35.10"               % "test, it",
-    "org.scalatestplus.play"  %% "scalatestplus-play"       % "4.0.3"                 % "test, it"
+    "com.vladsch.flexmark"    %  "flexmark-all"             % "0.35.10"               % Test,
+    "org.scalatestplus.play"  %% "scalatestplus-play"       % "4.0.3"                 % Test,
+    "com.github.tomakehurst"  %  "wiremock-standalone"      % "2.22.0"                % Test
   )
 }

@@ -1,4 +1,5 @@
 # Prod Routes
 
 
-GET        /admin/metrics                                  @com.kenshoo.play.metrics.MetricsController.metrics
+GET        /admin/metrics                                       @com.kenshoo.play.metrics.MetricsController.metrics
+GET        /organisations/interest-restrictions-return/full     controllers.FullReturnController.fullReturn()

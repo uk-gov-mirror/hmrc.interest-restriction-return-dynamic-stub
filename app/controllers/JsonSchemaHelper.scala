@@ -21,8 +21,15 @@ import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import play.api.libs.json.{JsValue, Json}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.core.JsonParser
+import scala.concurrent.Future
+import play.api.Logging
+import play.api.mvc._
+import play.api.mvc.Results._
+import scala.util.{Try, Success, Failure}
+import scala.io.Source
+import play.api.libs.json._
 
-object JsonSchemaHelper {
+object JsonSchemaHelper extends Logging {
 
   private final lazy val jsonMapper = new ObjectMapper()
   private final lazy val jsonFactory = jsonMapper.getFactory
@@ -43,6 +50,26 @@ object JsonSchemaHelper {
       result.isSuccess
     }
   }
+
+  def applySchemaValidation(schemaPath: String)(f: => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+    val schemaFile = Source.fromFile(schemaPath)
+    val fullReturnJsonSchema = Try(schemaFile.mkString)
+    val jsonBody: Option[JsValue] = request.body.asJson
+    val result = fullReturnJsonSchema match {
+      case Success(schema) =>
+        val fullJsonSchema : JsValue = Json.parse(schema)
+        JsonSchemaHelper.validRequest(fullJsonSchema, jsonBody) match {
+            case true => f
+            case false => Future.successful(BadRequest("test"))
+        }
+      case Failure(e) => 
+        logger.error(s"Error: ${e.getMessage}", e)
+        Future.successful(InternalServerError(""))
+    }
+    schemaFile.close()
+    result
+  } 
+
 
 }
 
