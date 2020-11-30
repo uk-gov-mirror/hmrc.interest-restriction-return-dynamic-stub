@@ -121,6 +121,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "Missing body"
     }
+    
   }
 
   def changeAgentName(body: JsValue, newAgentName: String): JsObject = {
