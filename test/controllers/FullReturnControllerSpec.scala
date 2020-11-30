@@ -20,12 +20,14 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.{HeaderNames, Status}
-import play.api.libs.json.{JsValue, Json, JsObject, JsString}
+import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
+
 import scala.io.Source
 import actions.AuthenticatedAction
 import play.api.mvc.BodyParsers
+import play.api.mvc.Results.Unauthorized
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -109,6 +111,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
+      contentAsString(result) shouldBe "Missing Bearer Token"
     }
 
   }

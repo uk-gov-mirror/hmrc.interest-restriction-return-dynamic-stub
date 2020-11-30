@@ -28,12 +28,11 @@ class AuthenticatedAction @Inject()(override val parser: BodyParsers.Default)(im
     extends ActionBuilderImpl(parser) {
 
   override def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]) = {
-    if(request.headers.get(HeaderNames.AUTHORIZATION).isDefined)
-      block(request) 
-    else
-      future { Results.Status(Status.UNAUTHORIZED) }
+    request.headers.get(HeaderNames.AUTHORIZATION) match {
+      case None => Future.successful(Unauthorized("Missing Bearer Token"))
+      case Some(_) => block(request)
+    }
   }
-
 }
 
 /*
