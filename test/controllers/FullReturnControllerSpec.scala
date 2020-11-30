@@ -27,7 +27,6 @@ import play.api.test.Helpers._
 import scala.io.Source
 import actions.AuthenticatedAction
 import play.api.mvc.BodyParsers
-import play.api.mvc.Results.Unauthorized
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
