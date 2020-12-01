@@ -35,7 +35,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
   val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
 
   val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
-  
+
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
   val bodyParsers = app.injector.instanceOf[BodyParsers.Default]
   val authenticatedAction: AuthenticatedAction = new AuthenticatedAction(bodyParsers)
@@ -138,6 +138,6 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       case Some(name) => agentDetails.as[JsObject] + ("agentName" -> JsString(name))
       case None => agentDetails.as[JsObject] - "agentName"
     }
-    exampleJsonBody.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
+    body.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
   }
 }
