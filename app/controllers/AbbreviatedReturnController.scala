@@ -26,7 +26,7 @@ import play.api.Logging
 import actions.AuthenticatedAction
 
 @Singleton()
-class AbbreviatedIRRController @Inject() (authenticatedAction: AuthenticatedAction, cc: ControllerComponents) extends BackendController(cc) with Logging {
+class AbbreviatedReturnController @Inject() (authenticatedAction: AuthenticatedAction, cc: ControllerComponents) extends BackendController(cc) with Logging {
 
   def abbreviation(): Action[AnyContent] = authenticatedAction.async { implicit request =>
     val jsonBody: Option[JsValue] = request.body.asJson
