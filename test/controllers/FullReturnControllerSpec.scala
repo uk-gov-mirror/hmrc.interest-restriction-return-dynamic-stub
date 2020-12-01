@@ -70,7 +70,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     }
 
     "returns a 500 when a ServerError agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, "ServerError")
+      val amendedBody = changeAgentName(exampleJsonBody, Some("ServerError"))
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -79,7 +79,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     }
 
     "returns 503 when a Service unavailable agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, "ServiceUnavailable")
+      val amendedBody = changeAgentName(exampleJsonBody, Some("ServiceUnavailable"))
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -88,7 +88,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
     }
 
     "returns 401 when an Unauthorized agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, "Unauthorized")
+      val amendedBody = changeAgentName(exampleJsonBody, Some("Unauthorized"))
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -121,11 +121,23 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       status(result) shouldBe Status.BAD_REQUEST
       contentAsString(result) shouldBe "Missing body"
     }
+
+    "returns 201 when no agent name is passed" in {
+      val amendedBody = changeAgentName(exampleJsonBody, None)
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+    }
   }
 
-  def changeAgentName(body: JsValue, newAgentName: String): JsObject = {
+  def changeAgentName(body: JsValue, newAgentName: Option[String]): JsObject = {
     val agentDetails = body.as[JsObject] \ "agentDetails"
-    val amendedAgentDetails = agentDetails.as[JsObject] + ("agentName" -> JsString(newAgentName))
+    val amendedAgentDetails = newAgentName match {
+      case Some(name) => agentDetails.as[JsObject] + ("agentName" -> JsString(name))
+      case None => agentDetails.as[JsObject] - "agentName"
+    }
     exampleJsonBody.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
   }
 }

@@ -32,12 +32,12 @@ class FullReturnController @Inject() (authenticatedAction: AuthenticatedAction, 
     val jsonBody: Option[JsValue] = request.body.asJson
 
     JsonSchemaHelper.applySchemaValidation("conf/resources/schemas/submit_full_irr.json") {
-      val agentName = (jsonBody.getOrElse(JsString("")) \ "agentDetails" \ "agentName").as[String]
+      val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
       
       agentName match {
-        case "ServerError" => Future.successful(InternalServerError(agentName))
-        case "ServiceUnavailable" => Future.successful(ServiceUnavailable(agentName))
-        case "Unauthorized" => Future.successful(Unauthorized(agentName))
+        case Some("ServerError") => Future.successful(InternalServerError(""))
+        case Some("ServiceUnavailable") => Future.successful(ServiceUnavailable(""))
+        case Some("Unauthorized") => Future.successful(Unauthorized(""))
         case _ => {
           val responseString = """{"acknowledgementReference":"1234"}"""
           val responseJson = Json.parse(responseString)
