@@ -30,4 +30,28 @@ import play.api.mvc.BodyParsers
 
 class AbbreviatedIRRControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
+  val exampleJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_abbreviated_irr_reporting_company_body.json").mkString)
+  val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
+
+  implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
+  val bodyParsers = app.injector.instanceOf[BodyParsers.Default]
+  val authenticatedAction: AuthenticatedAction = new AuthenticatedAction(bodyParsers)
+
+  "POST Abbreviated IRR reporting company" should {
+    "return 201 when the payload is validated" in {
+
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody)
+      val controller = new AbbreviatedIRRController(authenticatedAction, Helpers.stubControllerComponents())
+      val result = controller.abbreviation()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+    }
+
+    "returns 400 when the payload is invalid" in {
+      val exampleInvalidJsonBody = exampleJsonBody.as[JsObject] - "agentDetails"
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleInvalidJsonBody)
+      val controller = new AbbreviatedIRRController(authenticatedAction, Helpers.stubControllerComponents())
+      val result = controller.abbreviation()(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+  }
 }
