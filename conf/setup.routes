@@ -1,8 +1,0 @@
-# microservice specific routes
-
-POST        /schema                                                 controllers.setup.SetupSchemaController.addSchema
-DELETE      /schema                                                 controllers.setup.SetupSchemaController.removeSchema(id: String)
-DELETE      /all-schemas                                            controllers.setup.SetupSchemaController.removeAllSchemas
-
-POST        /data                                                   controllers.setup.SetupDataController.addData
-DELETE      /all-data                                               controllers.setup.SetupDataController.removeAllData
