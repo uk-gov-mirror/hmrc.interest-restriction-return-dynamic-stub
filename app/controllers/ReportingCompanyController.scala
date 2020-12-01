@@ -45,7 +45,25 @@ class ReportingCompanyController @Inject() (authenticatedAction: AuthenticatedAc
         }
       }
     }
+  }
 
+  def revoke(): Action[AnyContent] = authenticatedAction.async { implicit request =>
+    val jsonBody: Option[JsValue] = request.body.asJson
+
+    JsonSchemaHelper.applySchemaValidation("conf/resources/schemas/revoke_irr_reporting_company.json") {
+      val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
+
+      agentName match {
+        case Some("ServerError") => Future.successful(InternalServerError(""))
+        case Some("ServiceUnavailable") => Future.successful(ServiceUnavailable(""))
+        case Some("Unauthorized") => Future.successful(Unauthorized(""))
+        case _ => {
+          val responseString = """{"acknowledgementReference":"1234"}"""
+          val responseJson = Json.parse(responseString)
+          Future.successful(Created(responseJson))
+        }
+      }
+    }
   }
 
 }
