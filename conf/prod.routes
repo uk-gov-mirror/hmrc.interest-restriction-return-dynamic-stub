@@ -3,3 +3,4 @@
 
 GET        /admin/metrics                                       @com.kenshoo.play.metrics.MetricsController.metrics
 POST       /organisations/interest-restrictions-return/full     controllers.FullReturnController.fullReturn()
+POST       /organisations/interest-restrictions-return/appoint  controllers.ReportingCompanyController.appoint()
