@@ -31,7 +31,7 @@ class FullReturnController @Inject() (authenticatedAction: AuthenticatedAction, 
   def fullReturn(): Action[AnyContent] = authenticatedAction.async { implicit request =>
     val jsonBody: Option[JsValue] = request.body.asJson
 
-    JsonSchemaHelper.applySchemaValidation("conf/resources/schemas/submit_full_irr.json") {
+    JsonSchemaHelper.applySchemaValidation("/resources/schemas/submit_full_irr.json", jsonBody) {
       val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
       
       agentName match {

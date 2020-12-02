@@ -31,7 +31,7 @@ class ReportingCompanyController @Inject() (authenticatedAction: AuthenticatedAc
   def appoint(): Action[AnyContent] = authenticatedAction.async { implicit request =>
     val jsonBody: Option[JsValue] = request.body.asJson
 
-    JsonSchemaHelper.applySchemaValidation("conf/resources/schemas/appoint_irr_reporting_company.json") {
+    JsonSchemaHelper.applySchemaValidation("/resources/schemas/appoint_irr_reporting_company.json", jsonBody) {
       val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
       
       agentName match {
@@ -50,7 +50,7 @@ class ReportingCompanyController @Inject() (authenticatedAction: AuthenticatedAc
   def revoke(): Action[AnyContent] = authenticatedAction.async { implicit request =>
     val jsonBody: Option[JsValue] = request.body.asJson
 
-    JsonSchemaHelper.applySchemaValidation("conf/resources/schemas/revoke_irr_reporting_company.json") {
+    JsonSchemaHelper.applySchemaValidation("/resources/schemas/revoke_irr_reporting_company.json", jsonBody) {
       val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
 
       agentName match {

@@ -67,14 +67,10 @@ object JsonSchemaHelper extends Logging {
     }
   }
 
-  def applySchemaValidation(schemaPath: String)(f: => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
-    val schemaFile = Source.fromFile(schemaPath)
-    val fullReturnJsonSchema = Try(schemaFile.mkString)
-    val jsonBody: Option[JsValue] = request.body.asJson
-    val result = fullReturnJsonSchema match {
+  def applySchemaValidation(schemaPath: String, jsonBody: Option[JsValue])(f: => Future[Result]): Future[Result] = {
+    retrieveJsonSchema(schemaPath) match {
       case Success(schema) =>
-        val fullJsonSchema : JsValue = Json.parse(schema)
-        val validationResult = JsonSchemaHelper.validRequest(fullJsonSchema, jsonBody)
+        val validationResult = JsonSchemaHelper.validRequest(schema, jsonBody)
         validationResult match {
             case Some(res) if res.isSuccess => f
             case Some(res) => Future.successful(BadRequest(res.toString()))
@@ -84,10 +80,12 @@ object JsonSchemaHelper extends Logging {
         logger.error(s"Error: ${e.getMessage}", e)
         Future.successful(InternalServerError(""))
     }
-    schemaFile.close()
-    result
   }
 
+  def retrieveJsonSchema(schemaPath: String): Try[JsValue] = {
+    val jsonSchema = Try(Source.fromInputStream(getClass.getResourceAsStream(schemaPath)).mkString)
+    jsonSchema.map(Json.parse)
+  }
 
 }
 
