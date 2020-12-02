@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2020 HM Revenue & Customs
  *
@@ -28,7 +29,7 @@ import scala.io.Source
 import actions.AuthenticatedAction
 import play.api.mvc.BodyParsers
 
-class AbbreviatedIRRControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
   val exampleJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_abbreviated_irr_reporting_company_body.json").mkString)
   val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
