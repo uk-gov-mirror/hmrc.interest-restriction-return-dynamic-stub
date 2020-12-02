@@ -5,3 +5,4 @@ GET        /admin/metrics                                       @com.kenshoo.pla
 POST       /organisations/interest-restrictions-return/full     controllers.FullReturnController.fullReturn()
 POST       /organisations/interest-restrictions-return/appoint  controllers.ReportingCompanyController.appoint()
 POST       /organisations/interest-restrictions-return/revoke   controllers.ReportingCompanyController.revoke()
+POST       /organisations/interest-restrictions-return/abbreviate  controllers.AbbreviatedReturnController.abbreviation()
