@@ -74,19 +74,19 @@ object JsonSchemaHelper extends Logging {
     val result = fullReturnJsonSchema match {
       case Success(schema) =>
         val fullJsonSchema : JsValue = Json.parse(schema)
-        val validationResult = JsonSchemaHelper.validRequest(fullJsonSchema, jsonBody) 
+        val validationResult = JsonSchemaHelper.validRequest(fullJsonSchema, jsonBody)
         validationResult match {
             case Some(res) if res.isSuccess => f
             case Some(res) => Future.successful(BadRequest(res.toString()))
             case _ => Future.successful(BadRequest("Missing body"))
         }
-      case Failure(e) => 
+      case Failure(e) =>
         logger.error(s"Error: ${e.getMessage}", e)
         Future.successful(InternalServerError(""))
     }
     schemaFile.close()
     result
-  } 
+  }
 
 
 }

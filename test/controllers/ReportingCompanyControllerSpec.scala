@@ -30,7 +30,8 @@ import play.api.mvc.BodyParsers
 
 class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val exampleJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_appoint_irr_reporting_company_body.json").mkString)
+  val exampleAppointJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_appoint_irr_reporting_company_body.json").mkString)
+  val exampleRevokeJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_revoke_irr_reporting_company_body.json").mkString)
   val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
   
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
@@ -39,7 +40,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
 
   "POST appoint irr reporting company" should {
     "return 201 when the payload is validated" in {
-      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody);
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleAppointJsonBody);
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents());
 
       val result = controller.appoint()(fakeRequest)
@@ -48,7 +49,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns 400 when the payload is invalid" in {
-      val exampleInvalidJsonBody = exampleJsonBody.as[JsObject] - "agentDetails"
+      val exampleInvalidJsonBody = exampleAppointJsonBody.as[JsObject] - "agentDetails"
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleInvalidJsonBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -58,7 +59,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns a body containing acknowledgementReference when the payload is validated" in {
-      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody);
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleAppointJsonBody);
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.appoint()(fakeRequest)
@@ -67,7 +68,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns a 500 when a ServerError agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, Some("ServerError"))
+      val amendedBody = changeAgentName(exampleAppointJsonBody, Some("ServerError"))
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -76,7 +77,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns 503 when a Service unavailable agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, Some("ServiceUnavailable"))
+      val amendedBody = changeAgentName(exampleAppointJsonBody, Some("ServiceUnavailable"))
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -85,7 +86,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns 401 when an Unauthorized agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, Some("Unauthorized"))
+      val amendedBody = changeAgentName(exampleAppointJsonBody, Some("Unauthorized"))
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
@@ -94,7 +95,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns 201 when a bearer token is passed" in {
-      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody)
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleAppointJsonBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.appoint()(fakeRequest)
@@ -102,7 +103,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns 401 when a bearer token is not passed" in {
-      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleJsonBody)
+      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleAppointJsonBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.appoint()(fakeRequest)
@@ -120,11 +121,103 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
     }
 
     "returns 201 when no agent name is passed" in {
-      val amendedBody = changeAgentName(exampleJsonBody, None)
+      val amendedBody = changeAgentName(exampleAppointJsonBody, None)
       val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
       val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.appoint()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+    }
+  }
+
+  "POST revoke reporting company" should {
+    "return 201 when the payload is validated" in {
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleRevokeJsonBody);
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents());
+
+      val result = controller.revoke()(fakeRequest)
+
+      status(result) shouldBe Status.CREATED
+    }
+
+    "returns 400 when the payload is invalid" in {
+      val exampleInvalidJsonBody = exampleRevokeJsonBody.as[JsObject] - "agentDetails"
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleInvalidJsonBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+
+      status(result) shouldBe Status.BAD_REQUEST
+    }
+
+    "returns a body containing acknowledgementReference when the payload is validated" in {
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleRevokeJsonBody);
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+
+      (contentAsJson(result) \ "acknowledgementReference").as[String] shouldBe "1234"
+    }
+
+    "returns a 500 when a ServerError agent name is passed" in {
+      val amendedBody = changeAgentName(exampleRevokeJsonBody, Some("ServerError"))
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+    }
+
+    "returns 503 when a Service unavailable agent name is passed" in {
+      val amendedBody = changeAgentName(exampleRevokeJsonBody, Some("ServiceUnavailable"))
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+      status(result) shouldBe Status.SERVICE_UNAVAILABLE
+    }
+
+    "returns 401 when an Unauthorized agent name is passed" in {
+      val amendedBody = changeAgentName(exampleRevokeJsonBody, Some("Unauthorized"))
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+      status(result) shouldBe Status.UNAUTHORIZED
+    }
+
+    "returns 201 when a bearer token is passed" in {
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleRevokeJsonBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+    }
+
+    "returns 401 when a bearer token is not passed" in {
+      val fakeRequest = FakeRequest("POST", "/").withJsonBody(exampleRevokeJsonBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+      status(result) shouldBe Status.UNAUTHORIZED
+      contentAsString(result) shouldBe "Missing Bearer Token"
+    }
+
+    "returns 400 when a body is empty" in {
+      val fakeRequest = FakeRequestWithHeaders
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsString(result) shouldBe "Missing body"
+    }
+
+    "returns 201 when no agent name is passed" in {
+      val amendedBody = changeAgentName(exampleRevokeJsonBody, None)
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(amendedBody)
+      val controller = new ReportingCompanyController(authenticatedAction, Helpers.stubControllerComponents())
+
+      val result = controller.revoke()(fakeRequest)
       status(result) shouldBe Status.CREATED
     }
   }
@@ -135,6 +228,6 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
       case Some(name) => agentDetails.as[JsObject] + ("agentName" -> JsString(name))
       case None => agentDetails.as[JsObject] - "agentName"
     }
-    exampleJsonBody.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
+    body.as[JsObject] + ("agentDetails" -> amendedAgentDetails)
   }
 }
