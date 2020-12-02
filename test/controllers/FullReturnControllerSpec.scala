@@ -129,7 +129,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.CREATED
-    }g
+    }
   }
 
   def changeAgentName(body: JsValue, newAgentName: Option[String]): JsObject = {
