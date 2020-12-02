@@ -1,44 +1,96 @@
 {
   "agentDetails": {
     "agentActingOnBehalfOfCompany": true,
-    "agentName": "AAgent"
+    "agentName": "Some agent"
   },
   "reportingCompany": {
-    "companyName": "ACompany",
-    "ctutr": "1123456789",
+    "companyName": "A Reporting Company",
+    "ctutr": "1123456747",
     "sameAsUltimateParent": true
   },
-  "isReportingCompanyAppointingItself": false,
-  "identityOfAppointingCompany": {
-    "companyName": "BCompany",
-    "countryOfIncorporation": "UK",
-    "ctutr": "9999999999",
-    "legalEntityIdentifier": "Z29900T8BM49AURSDO53"
+  "parentCompany": {
+    "ultimateParent": {
+      "isUk": true,
+      "ctutr": "8764783632",
+      "sautr": "0897876656",
+      "knownAs": "$$=!|~Ḁỿ",
+      "legalEntityIdentifier": "213800WRYCD72WGOOY58",
+      "companyName": "$$=!|~Ḁỿ",
+      "countryOfIncorporation": "JP"
+    }
   },
-  "authorisingCompanies": [
+  "publicInfrastructure": true,
+  "groupCompanyDetails": {
+    "totalCompanies": 1,
+    "accountingPeriod": {
+      "startDate": "1920-02-29",
+      "endDate": "1920-02-29"
+    }
+  },
+  "submissionType": "original",
+  "revisedReturnDetails": "Calculation symbols and formulae y=x,  73463784 ÷ (839393987 + 73678979)",
+  "angie": 0.01,
+  "groupLevelElections": {
+    "groupRatio": {
+      "isElected": true,
+      "groupRatioBlended": {
+        "isElected": true,
+        "investorGroups": [
+          {
+            "groupName": "₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲",
+            "elections": [
+              "groupRatioBlended",
+              "groupEBITDA",
+              "interestAllowanceAlternativeCalculation",
+              "interestAllowanceNonConsolidatedInvestment",
+              "interestAllowanceConsolidatedPartnership"
+            ]
+          },
+          {
+            "groupName": " ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ ₿"
+          }
+        ]
+      },
+      "groupEBITDAChargeableGains": true
+    },
+    "interestAllowanceAlternativeCalculation": true,
+    "interestAllowanceNonConsolidatedInvestment": {
+      "isElected": true,
+      "nonConsolidatedInvestments": [
+        {
+          "investmentName": "Investment 12323"
+        },
+        {
+          "investmentName": "Investment C"
+        }
+      ]
+    },
+    "interestAllowanceConsolidatedPartnership": {
+      "isElected": true,
+      "consolidatedPartnerships": [
+        {
+          "partnershipName": "Öbs",
+          "sautr": "3466564633"
+        },
+        {
+          "partnershipName": "Äßß",
+          "sautr": "9495644574"
+        }
+      ]
+    }
+  },
+  "ukCompanies": [
     {
-      "companyName": "CCompany",
-      "utr": "5555555555",
-      "consenting": true
+      "companyName": "!!Company A$$$==",
+      "utr": "7634834546",
+      "consenting": true,
+      "qicElection": true
     },
     {
-      "companyName": "D-Company, with unusual chars & % ! | ~ #",
-      "utr": "1122334455",
-      "consenting": true
+      "companyName": "!!Company B $$$==",
+      "utr": "7236453286",
+      "consenting": true,
+      "qicElection": true
     }
-  ],
-  "ultimateParentCompany": {
-    "isUk": true,
-    "companyName": "E*Company$$",
-    "ctutr": "0000000000",
-    "sautr": "1237658890",
-    "knownAs": "655 Squadron",
-    "countryOfIncorporation": "ZA",
-    "legalEntityIdentifier": "549300QKDHYRRQH2MB86"
-  },
-  "accountingPeriod": {
-    "startDate": "2018-11-01",
-    "endDate": "2019-12-01"
-  },
-  "declaration": true
+  ]
 }
