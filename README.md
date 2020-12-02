@@ -51,14 +51,14 @@ This is a protected backend microservice that stubs the functionality of the HMR
       "consenting": true
     },
     {
-      "companyName": "D-Company, with unusual chars & % ! | ~ #",
+      "companyName": "D-Company",
       "utr": "1122334455",
       "consenting": true
     }
   ],
   "ultimateParentCompany": {
     "isUk": true,
-    "companyName": "E*Company$$",
+    "companyName": "E*Company",
     "ctutr": "0000000000",
     "sautr": "1237658890",
     "knownAs": "655 Squadron",
@@ -136,14 +136,14 @@ Status: `201 (CREATED)`
       "consenting": true
     },
     {
-      "companyName": "D-Company, with unusual chars & % ! | ~ #",
+      "companyName": "D-Company",
       "utr": "1122334455",
       "consenting": true
     }
   ],
   "ultimateParentCompany": {
     "isUk": true,
-    "companyName": "E*Company$$",
+    "companyName": "E*Company",
     "ctutr": "0000000000",
     "sautr": "1237658890",
     "knownAs": "Mabel",
@@ -211,9 +211,9 @@ Status: `201 (CREATED)`
 			"isUk": true,
 			"ctutr": "8764783632",
 			"sautr": "0897876656",
-			"knownAs": "$$=!|~Ḁỿ",
+			"knownAs": "ACompany",
 			"legalEntityIdentifier": "213800WRYCD72WGOOY58",
-			"companyName": "$$=!|~Ḁỿ",
+			"companyName": "ACompany",
 			"countryOfIncorporation": "JP"
 		}
 	},
@@ -234,7 +234,7 @@ Status: `201 (CREATED)`
 			"groupRatioBlended": {
 				"isElected": true,
 				"investorGroups": [{
-						"groupName": "₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲",
+						"groupName": "AGroup",
 						"elections": [
 							"groupRatioBlended",
 							"groupEBITDA",
@@ -244,7 +244,7 @@ Status: `201 (CREATED)`
 						]
 					},
 					{
-						"groupName": " ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ ₿"
+						"groupName": "AGroup"
 					}
 				]
 			},
@@ -275,13 +275,13 @@ Status: `201 (CREATED)`
 		}
 	},
 	"ukCompanies": [{
-			"companyName": "!!Company A$$$==",
+			"companyName": "Company A",
 			"utr": "7634834546",
 			"consenting": true,
 			"qicElection": true
 		},
 		{
-			"companyName": "!!Company B $$$==",
+			"companyName": "Company B",
 			"utr": "7236453286",
 			"consenting": true,
 			"qicElection": true
@@ -343,9 +343,9 @@ Status: `201 (CREATED)`
         "isUk": true,
         "ctutr": "8764783632",
         "sautr": "0897876656",
-        "knownAs": "$$=!|~Ḁỿ",
+        "knownAs": "ACompany",
         "legalEntityIdentifier": "549300D178N8UFD6I259",
-        "companyName": "$$=!|~Ḁỿ",
+        "companyName": "ACompany",
         "countryOfIncorporation": "JP"
       }
     },
@@ -362,7 +362,7 @@ Status: `201 (CREATED)`
     "angie": 0,
     "returnContainsEstimates": true,
     "groupEstimateReason": "Having trouble with multiplication ×, division ÷, and money ₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ ₿",
-    "companiesEstimateReason": "%%Some company names are ≣ to each other © ±!%%",
+    "companiesEstimateReason": "Estimate reason",
     "groupSubjectToInterestRestrictions": true,
     "groupSubjectToInterestReactivation": true,
     "revisedReturnDifferences": "≈ ≤≥",
@@ -373,7 +373,7 @@ Status: `201 (CREATED)`
           "isElected": true,
           "investorGroups": [
             {
-              "groupName": "₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲",
+              "groupName": "AGroup",
               "elections": [
                 "groupRatioBlended",
                 "groupEBITDA",
@@ -383,7 +383,7 @@ Status: `201 (CREATED)`
               ]
             },
             {
-              "groupName": " ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ ₿",
+              "groupName": "BGroup",
               "elections": [
                 "groupRatioBlended",
                 "groupEBITDA"
@@ -421,7 +421,7 @@ Status: `201 (CREATED)`
     },
     "ukCompanies": [
       {
-        "companyName": "!!Company A$$$==",
+        "companyName": "Company A",
         "companyEstimateReason": "?",
         "utr": "7634834546",
         "consenting": true,
@@ -443,7 +443,7 @@ Status: `201 (CREATED)`
         }
       },
       {
-        "companyName": "!!Company B $$$==",
+        "companyName": "Company B",
         "utr": "7236453286",
         "consenting": true,
         "qicElection": true,
