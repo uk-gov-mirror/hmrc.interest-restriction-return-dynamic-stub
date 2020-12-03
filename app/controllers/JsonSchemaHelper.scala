@@ -74,7 +74,9 @@ object JsonSchemaHelper extends Logging {
         val validationResult = JsonSchemaHelper.validRequest(schema, jsonBody)
         validationResult match {
             case Some(res) if res.isSuccess => f
-            case Some(res) => Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.InvalidJson)))))
+            case Some(res) =>
+              logger.info(s"Json schema failed with: ${res.toString}")
+              Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.InvalidJson)))))
             case _ => Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.MissingBody)))))
         }
       case Failure(e) =>
