@@ -27,6 +27,7 @@ import play.api.test.Helpers._
 import scala.io.Source
 import actions.AuthenticatedAction
 import play.api.mvc.BodyParsers
+import models.{ErrorResponse, FailureMessage}
 
 class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -52,6 +53,7 @@ class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with Gui
       val controller = new AbbreviatedReturnController(authenticatedAction, Helpers.stubControllerComponents())
       val result = controller.abbreviation()(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.InvalidJson
     }
 
     "returns a body containing acknowledgementReference when the payload is validated" in {
@@ -67,6 +69,7 @@ class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with Gui
       val controller = new AbbreviatedReturnController(authenticatedAction, Helpers.stubControllerComponents())
       val result = controller.abbreviation()(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.ServerError
     }
 
     "returns 503 when a Service unavailable agent name is passed" in {
@@ -75,6 +78,7 @@ class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with Gui
       val controller = new AbbreviatedReturnController(authenticatedAction, Helpers.stubControllerComponents())
       val result = controller.abbreviation()(fakeRequest)
       status(result) shouldBe Status.SERVICE_UNAVAILABLE
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.ServiceUnavailable
     }
 
     "returns 401 when an Unauthorized agent name is passed" in {
@@ -83,6 +87,7 @@ class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with Gui
       val controller = new AbbreviatedReturnController(authenticatedAction, Helpers.stubControllerComponents())
       val result = controller.abbreviation()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.Unauthorized
     }
 
     "returns 201 when a bearer token is passed" in {
@@ -97,7 +102,7 @@ class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with Gui
       val controller = new AbbreviatedReturnController(authenticatedAction, Helpers.stubControllerComponents())
       val result = controller.abbreviation()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
-      contentAsString(result) shouldBe "Missing Bearer Token"
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.MissingBearerToken
     }
 
     "returns 400 when a body is empty" in {
@@ -105,7 +110,7 @@ class AbbreviatedReturnControllerSpec extends AnyWordSpec with Matchers with Gui
       val controller = new AbbreviatedReturnController(authenticatedAction, Helpers.stubControllerComponents())
       val result = controller.abbreviation()(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "Missing body"
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.MissingBody
     }
 
     "returns 201 when no agent name is passed" in {

@@ -44,6 +44,7 @@ import play.api.mvc.Results._
 import scala.util.{Try, Success, Failure}
 import scala.io.Source
 import play.api.libs.json._
+import models.{ErrorResponse, FailureMessage}
 
 object JsonSchemaHelper extends Logging {
 
@@ -73,8 +74,10 @@ object JsonSchemaHelper extends Logging {
         val validationResult = JsonSchemaHelper.validRequest(schema, jsonBody)
         validationResult match {
             case Some(res) if res.isSuccess => f
-            case Some(res) => Future.successful(BadRequest(res.toString()))
-            case _ => Future.successful(BadRequest("Missing body"))
+            case Some(res) =>
+              logger.info(s"Json schema failed with: ${res.toString}")
+              Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.InvalidJson)))))
+            case _ => Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.MissingBody)))))
         }
       case Failure(e) =>
         logger.error(s"Error: ${e.getMessage}", e)

@@ -20,20 +20,18 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.{HeaderNames, Status}
-import play.api.libs.json.{JsObject, JsString, JsValue, Json}
+import play.api.libs.json.{JsObject, Json, JsString, JsSuccess, JsValue}
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
 
 import scala.io.Source
 import actions.AuthenticatedAction
 import play.api.mvc.BodyParsers
+import models.{ErrorResponse, FailureMessage}
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val fullReturnJsonSchema = Source.fromFile("conf/resources/api/submit_full_irr_apidef.json").mkString
-  val fullJsonSchema : JsValue = Json.parse(fullReturnJsonSchema)
-  val exampleJsonBody = (fullJsonSchema \ "paths" \ "/organisations/interest-restrictions-return/full" \ "post" \ "requestBody" \ "content" \ "application/json;charset=UTF-8" \ "examples" \ "Full Population" \ "value").as[JsValue]
-
+  val exampleJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_submit_full_irr_body.json").mkString)
   val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
@@ -56,8 +54,8 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
 
       val result = controller.fullReturn()(fakeRequest)
-
       status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.InvalidJson
     }
 
     "returns a body containing acknowledgementReference when the payload is validated" in {
@@ -76,6 +74,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.ServerError
     }
 
     "returns 503 when a Service unavailable agent name is passed" in {
@@ -85,6 +84,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.SERVICE_UNAVAILABLE
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.ServiceUnavailable
     }
 
     "returns 401 when an Unauthorized agent name is passed" in {
@@ -94,6 +94,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.Unauthorized
     }
 
     "returns 201 when a bearer token is passed" in {
@@ -110,7 +111,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.UNAUTHORIZED
-      contentAsString(result) shouldBe "Missing Bearer Token"
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.MissingBearerToken
     }
     
     "returns 400 when a body is empty" in {
@@ -119,7 +120,7 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       val result = controller.fullReturn()(fakeRequest)
       status(result) shouldBe Status.BAD_REQUEST
-      contentAsString(result) shouldBe "Missing body"
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.MissingBody
     }
 
     "returns 201 when no agent name is passed" in {
