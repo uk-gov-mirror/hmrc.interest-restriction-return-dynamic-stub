@@ -23,13 +23,15 @@ import play.api.http.{HeaderNames}
 
 import scala.concurrent._
 import scala.concurrent.Future
+import models.{ErrorResponse, FailureMessage}
+import play.api.libs.json._
 
 class AuthenticatedAction @Inject()(override val parser: BodyParsers.Default)(implicit override val executionContext: ExecutionContext)
     extends ActionBuilderImpl(parser) {
 
   override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) : Future[Result] = {
     request.headers.get(HeaderNames.AUTHORIZATION) match {
-      case None => Future.successful(Unauthorized("Missing Bearer Token"))
+      case None => Future.successful(Unauthorized(Json.toJson(ErrorResponse(List(FailureMessage.MissingBearerToken)))))
       case Some(_) => block(request)
     }
   }

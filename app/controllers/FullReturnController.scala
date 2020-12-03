@@ -24,6 +24,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.json._
 import play.api.Logging
 import actions.AuthenticatedAction
+import models.{ErrorResponse, FailureMessage}
 
 @Singleton()
 class FullReturnController @Inject() (authenticatedAction: AuthenticatedAction, cc: ControllerComponents) extends BackendController(cc) with Logging {
@@ -35,9 +36,9 @@ class FullReturnController @Inject() (authenticatedAction: AuthenticatedAction, 
       val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
       
       agentName match {
-        case Some("ServerError") => Future.successful(InternalServerError(""))
-        case Some("ServiceUnavailable") => Future.successful(ServiceUnavailable(""))
-        case Some("Unauthorized") => Future.successful(Unauthorized(""))
+        case Some("ServerError") => Future.successful(InternalServerError(Json.toJson(ErrorResponse(List(FailureMessage.ServerError)))))
+        case Some("ServiceUnavailable") => Future.successful(ServiceUnavailable(Json.toJson(ErrorResponse(List(FailureMessage.ServiceUnavailable)))))
+        case Some("Unauthorized") => Future.successful(Unauthorized(Json.toJson(ErrorResponse(List(FailureMessage.Unauthorized)))))
         case _ => {
           val responseString = """{"acknowledgementReference":"1234"}"""
           val responseJson = Json.parse(responseString)
