@@ -33,7 +33,7 @@ class ReportingCompanyControllerSpec extends AnyWordSpec with Matchers with Guic
 
   val exampleAppointJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_appoint_irr_reporting_company_body.json").mkString)
   val exampleRevokeJsonBody: JsValue = Json.parse(Source.fromFile("conf/resources/examples/example_revoke_irr_reporting_company_body.json").mkString)
-  val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer THhp0fseNReXWL5ljkqrz0bb0wRhgbjT")
+  val FakeRequestWithHeaders = FakeRequest("POST", "/").withHeaders(HeaderNames.AUTHORIZATION -> "Bearer 1234")
   
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
   val bodyParsers = app.injector.instanceOf[BodyParsers.Default]
