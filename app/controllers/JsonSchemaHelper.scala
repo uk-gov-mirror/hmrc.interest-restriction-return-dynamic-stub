@@ -45,11 +45,15 @@ import scala.util.{Try, Success, Failure}
 import scala.io.Source
 import play.api.libs.json._
 import models.{ErrorResponse, FailureMessage}
+import config._
+import scala.concurrent._
 
 object JsonSchemaHelper extends Logging {
 
   private final lazy val jsonMapper = new ObjectMapper()
   private final lazy val jsonFactory = jsonMapper.getFactory
+
+  private final lazy val correlationIdRegex = "^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$"
 
   def loadRequestSchema(requestSchema: JsValue): JsonSchema = {
     val schemaMapper = new ObjectMapper()
@@ -90,5 +94,28 @@ object JsonSchemaHelper extends Logging {
     jsonSchema.map(Json.parse)
   }
 
-}
+  def applySchemaHeaderValidation(headers: Headers)(f: => Future[Result])(implicit ec: ExecutionContext): Future[Result] = {
+    val maybeCorrelationId: Option[String] = headers.get(HeaderKeys.correlationId)
+    val maybeEnvironment: Option[String] = headers.get(HeaderKeys.environment)
 
+    val correlationIdResult = maybeCorrelationId match {
+      case Some(correlationId) if isValidCorrelationId(correlationId) => f.map(_.withHeaders(HeaderKeys.correlationId -> correlationId))
+      case Some(_) => Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.InvalidCorrelationId)))))
+      case _ => f
+    }
+
+    maybeEnvironment match {
+      case Some(environment) if isValidEnvironment(environment) => correlationIdResult
+      case Some(environment) => Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.InvalidEnvironment)))))
+      case _ => correlationIdResult
+    }
+
+  }
+
+  def isValidEnvironment(environment: String): Boolean = {
+    EnvironmentValues.all.contains(environment)
+  }
+  
+  def isValidCorrelationId(correlationId: String): Boolean = 
+    correlationId.matches(correlationIdRegex)
+}

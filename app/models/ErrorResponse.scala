@@ -33,6 +33,8 @@ object FailureMessage {
   val ServerError: FailureMessage = FailureMessage("SERVER_ERROR", "IF is currently experiencing problems that require live service intervention.")
   val ServiceUnavailable: FailureMessage = FailureMessage("SERVICE_UNAVAILABLE", "Dependent systems are currently not responding.")
   val Unauthorized: FailureMessage = FailureMessage("UNAUTHORIZED", "Request Unauthorized.")
+  val InvalidCorrelationId: FailureMessage = FailureMessage("INVALID_CORRELATIONID","Submission has not passed validation. Invalid Header CorrelationId.")
   val MissingBearerToken: FailureMessage = FailureMessage("MISSING_BEARER_TOKEN", "Bearer token is missing.")
   val MissingBody: FailureMessage = FailureMessage("MISSING_BODY", "There was no body provided.")
+  val InvalidEnvironment: FailureMessage = FailureMessage("INVALID_ENVIRONMENT", "The environment is invalid.")
 }
