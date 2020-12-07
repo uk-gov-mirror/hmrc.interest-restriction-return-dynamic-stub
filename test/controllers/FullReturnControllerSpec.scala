@@ -28,6 +28,7 @@ import scala.io.Source
 import actions.AuthenticatedAction
 import play.api.mvc.BodyParsers
 import models.{ErrorResponse, FailureMessage}
+import config._
 
 class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
@@ -46,6 +47,42 @@ class FullReturnControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
       val result = controller.fullReturn()(fakeRequest)
  
       status(result) shouldBe Status.CREATED
+    }
+    
+    "return 201 when the payload is validated and the environment is valid" in {
+      val env = EnvironmentValues.environmentDev
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody).withHeaders(HeaderKeys.environment -> env)
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+    }
+
+    "return 400 when the payload is validated and the environment is valid" in {  
+      val env = "Invalid environment"
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody).withHeaders(HeaderKeys.environment -> env)
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.InvalidEnvironment
+    }
+    
+    "return 201 and a correlationId when the payload is validated and the correlationId exists" in {
+      val uuid = java.util.UUID.randomUUID().toString
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody).withHeaders(HeaderKeys.correlationId -> uuid)
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.CREATED
+      headers(result) contains HeaderKeys.correlationId
+      header(HeaderKeys.correlationId, result) shouldBe Some(uuid)
+    }
+
+    "return 400 when the correlationId doesn't match the schema" in {
+      val uuid = "Not matching schema"
+      val fakeRequest = FakeRequestWithHeaders.withJsonBody(exampleJsonBody).withHeaders(HeaderKeys.correlationId -> uuid)
+      val controller = new FullReturnController(authenticatedAction, Helpers.stubControllerComponents())
+      val result = controller.fullReturn()(fakeRequest)
+      status(result) shouldBe Status.BAD_REQUEST
+      contentAsJson(result).as[ErrorResponse].failures.head shouldBe FailureMessage.InvalidCorrelationId
     }
 
     "returns 400 when the payload is invalid" in {

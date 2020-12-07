@@ -17,9 +17,17 @@
 package config
 
 object HeaderKeys {
-
   val providerId = "providerId"
-
   val validIdHeaders = Set(providerId)
+  val correlationId = "correlationId" 
+  val environment = "environment"
+}
 
+object EnvironmentValues {
+  val environmentIst0 = "ist0"
+  val environmentClone = "clone"
+  val environmentLive = "live"
+  val environmentDev = "dev"
+  
+  val all = List(environmentIst0, environmentClone, environmentLive, environmentDev)
 }

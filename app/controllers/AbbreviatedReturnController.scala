@@ -25,26 +25,35 @@ import play.api.libs.json._
 import play.api.Logging
 import actions.AuthenticatedAction
 import models.{ErrorResponse, FailureMessage}
+import config._
+import scala.concurrent._
 
 @Singleton()
-class AbbreviatedReturnController @Inject() (authenticatedAction: AuthenticatedAction, cc: ControllerComponents) extends BackendController(cc) with Logging {
+class AbbreviatedReturnController @Inject()(authenticatedAction: AuthenticatedAction, cc: ControllerComponents) extends BackendController(cc) with Logging {
+
+  implicit val ec: ExecutionContext = cc.executionContext
 
   def abbreviation(): Action[AnyContent] = authenticatedAction.async { implicit request =>
     val jsonBody: Option[JsValue] = request.body.asJson
 
-    JsonSchemaHelper.applySchemaValidation("/resources/schemas/abbreviated_irr.json", jsonBody) {
-      val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
+    JsonSchemaHelper.applySchemaHeaderValidation(request.headers) {
+      JsonSchemaHelper.applySchemaValidation("/resources/schemas/abbreviated_irr.json", jsonBody) {
+        val agentName = jsonBody.flatMap(body => (body \ "agentDetails" \ "agentName").asOpt[String])
 
-      agentName match {
-        case Some("ServerError") => Future.successful(InternalServerError(Json.toJson(ErrorResponse(List(FailureMessage.ServerError)))))
-        case Some("ServiceUnavailable") => Future.successful(ServiceUnavailable(Json.toJson(ErrorResponse(List(FailureMessage.ServiceUnavailable)))))
-        case Some("Unauthorized") => Future.successful(Unauthorized(Json.toJson(ErrorResponse(List(FailureMessage.Unauthorized)))))
-        case _ => {
-          val responseString = """{"acknowledgementReference":"1234"}"""
-          val responseJson = Json.parse(responseString)
-          Future.successful(Created(responseJson))
+        val response = agentName match {
+          case Some("ServerError") => InternalServerError(Json.toJson(ErrorResponse(List(FailureMessage.ServerError))))
+          case Some("ServiceUnavailable") => ServiceUnavailable(Json.toJson(ErrorResponse(List(FailureMessage.ServiceUnavailable))))
+          case Some("Unauthorized") => Unauthorized(Json.toJson(ErrorResponse(List(FailureMessage.Unauthorized))))
+          case _ => {
+            val responseString = """{"acknowledgementReference":"1234"}"""
+            val responseJson = Json.parse(responseString)
+            Created(responseJson)
+          }
         }
+
+        Future.successful(response)
       }
     }
   }
+
 }
