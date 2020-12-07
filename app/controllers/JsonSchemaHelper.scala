@@ -79,7 +79,7 @@ object JsonSchemaHelper extends Logging {
         validationResult match {
             case Some(res) if res.isSuccess => f
             case Some(res) =>
-              logger.info(s"Json schema failed with: ${res.toString}")
+              logger.info(s"[INTEREST-RESTRICTION-RETURN-DYNAMIC-STUB][VALIDATION-ERROR][${res.toString}]")
               Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.InvalidJson)))))
             case _ => Future.successful(BadRequest(Json.toJson(ErrorResponse(List(FailureMessage.MissingBody)))))
         }
